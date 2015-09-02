@@ -7,5 +7,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'build'),
     filename: "graph.js"
+  },
+  devServer: {
+    contentBase: "./assets"
   }
 };
