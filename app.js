@@ -9702,18 +9702,19 @@
 
 	var config = __webpack_require__(3);
 
-	var filters = {
-	  gender: '',
-	  ethnicity: '',
-	  poverty: '',
-	  lep: '',
-	  meet_math: '',
-	  meet_read: '',
-	  hs_name: '',
-	  district: ''
-	};
+	var filters = {},
+	  filterLabels = {
+	    gender: 'Gender',
+	    ethnicity: 'Ethnicity',
+	    poverty: 'Poverty',
+	    lep: 'Limited English Proficiency',
+	    meet_math: 'Meets Math Requirements',
+	    meet_read: 'Meets Reading Requirements',
+	    hs_name: 'High School',
+	    district: 'School District'
+	  };
 
-	var filterNames = Object.keys(filters),
+	var filterNames = Object.keys(filterLabels),
 	  labels = document.createDocumentFragment();
 
 	filterNames.forEach(function (filter) {
@@ -9732,14 +9733,18 @@
 	  });
 
 	  var label = document.createElement('label');
-	  label.appendChild(document.createTextNode(filter));
-	  label.appendChild(select);
-	  labels.appendChild(label);
+	  label.appendChild(document.createTextNode(filterLabels[filter]));
+	  var div = document.createElement('div');
+	  div.className = 'filter-container';
+
+	  div.appendChild(label);
+	  div.appendChild(select);
+	  labels.appendChild(div);
 	});
 
 	document.getElementById('filters').appendChild(labels);
 
-	Object.keys(filters).map(function (filter) {
+	Object.keys(filterLabels).map(function (filter) {
 	  d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
 	    for (var key in filterOptions) {
 	      var option = document.createElement('option');
