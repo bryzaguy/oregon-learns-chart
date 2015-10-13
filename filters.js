@@ -9,29 +9,17 @@ var filters = {
   lep: '',
   meet_math: '',
   meet_read: '',
-  district: '',
-  query: function () {
-    var params = [];
-    for (var key in this) {
-      if (typeof this[key] !== 'function' && this[key]) {
-        params.push('&' + key + '=' + this[key]);
-      }
-    }
-    return params.join();
-  }
+  district: ''
 };
 
 Object.keys(filters).forEach(function (filter) {
-  if (filter === 'query') {
-    return;
-  }
 
-  //filters
   d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
-    var select = document.createElement('select');
+    var select = document.createElement('select'),
+      nofilterText = 'No filter';
 
     var nofilter = document.createElement('option');
-    nofilter.appendChild(document.createTextNode('No filter'));
+    nofilter.appendChild(document.createTextNode(nofilterText));
     select.appendChild(nofilter);
 
     for (var key in filterOptions) {
@@ -42,8 +30,9 @@ Object.keys(filters).forEach(function (filter) {
     }
 
     select.addEventListener('change', function (e) {
-      filters[filter] = e.target.value;
-      drawGraph();
+      var value = e.target.value;
+      filters[filter] = value === nofilterText ? '' : value;
+      filters.drawGraph();
     });
 
     var label = document.createElement('label');
@@ -52,5 +41,15 @@ Object.keys(filters).forEach(function (filter) {
     document.getElementById('filters').appendChild(label);
   });
 });
+
+filters.query = function () {
+  var params = [];
+  for (var key in this) {
+    if (typeof this[key] !== 'function' && this[key]) {
+      params.push('&' + key + '=' + this[key]);
+    }
+  }
+  return params.join('');
+}
 
 module.exports = filters;
