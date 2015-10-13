@@ -1,18 +1,18 @@
 'use strict';
 
 var codes = {
-  H: "Highschool",
-  G: "Graduated",
-  X: "Dropped out",
-  Z: "No achievements",
-  2: "1st 2 Year",
-  T: "2nd 2 Year",
-  4: "1st 4 Year",
-  F: "2nd 4 Year",
-  C: "Certificate",
   B: "Bachelor+",
   A: "Associate",
-  D: "HS Diploma"
+  C: "Certificate",
+  F: "2nd 4 Year",
+  4: "1st 4 Year",
+  T: "2nd 2 Year",
+  2: "1st 2 Year",
+  G: "Graduated",
+  D: "HS Diploma",
+  X: "Did not graduate",
+  Z: "No achievements",
+  H: "Highschool",
 };
 
 function getCode(stage, index) {
@@ -36,7 +36,8 @@ module.exports = function (data) {
       .map(function (code) {
         return {
           code: code,
-          name: codes[code]
+          name: codes[code],
+          priority: Object.keys(codes).indexOf(code)
         };
       }),
     links: []
@@ -62,9 +63,6 @@ module.exports = function (data) {
     var value = modifiedData[key];
 
     // Zero and -1 don't need processing
-    if (modifiedData[key] < 1) {
-      continue;
-    }
 
     var results = key.split('')
       .reduce(function (path, stage, index) {

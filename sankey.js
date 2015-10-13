@@ -152,21 +152,20 @@ module.exports = function () {
       .key(function (d) {
         return d.x;
       })
-      .sortKeys(d3.ascending)
+      .sortKeys(d3.descending)
       .entries(nodes)
       .map(function (d) {
         return d.values;
       });
 
-    //
     initializeNodeDepth();
     resolveCollisions();
-    for (var alpha = 1; iterations > 0; --iterations) {
-      relaxRightToLeft(alpha *= 0.99);
-      resolveCollisions();
-      relaxLeftToRight(alpha);
-      resolveCollisions();
-    }
+    // for (var alpha = 1; iterations > 0; --iterations) {
+    //   relaxRightToLeft(alpha *= 0.99);
+    //   resolveCollisions();
+    //   relaxLeftToRight(alpha);
+    //   resolveCollisions();
+    // }
 
     function initializeNodeDepth() {
       var ky = d3.min(nodesByBreadth, function (nodes) {
@@ -223,6 +222,8 @@ module.exports = function () {
           n = nodes.length,
           i;
 
+        console.log(nodes);
+
         // Push any overlapping nodes down.
         nodes.sort(ascendingDepth);
         for (i = 0; i < n; ++i) {
@@ -249,6 +250,9 @@ module.exports = function () {
     }
 
     function ascendingDepth(a, b) {
+      if (a.priority && b.priority) {
+        return a.priority === b.priority ? 0 : a.priority > b.priority ? 1 : -1;
+      }
       return a.y - b.y;
     }
   }

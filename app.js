@@ -64,7 +64,7 @@
 
 	var formatNumber = d3.format(",.0f"),
 	  format = function (d) {
-	    return formatNumber(d) + " TWh";
+	    return formatNumber(d) + " students";
 	  },
 	  color = d3.scale.category20();
 
@@ -97,8 +97,6 @@
 
 	    var graph = apiToGraph(data);
 	    
-	    console.log(graph);
-
 	    if (!graph.links.length) {
 	      var text = document.createElement('h1');
 	      text.innerText = 'Not Enough Data';
@@ -120,7 +118,7 @@
 	        return Math.max(1, d.dy);
 	      })
 	      .sort(function (a, b) {
-	        return b.dy - a.dy;
+	        return a.dy - b.dy;
 	      });
 
 	    link.append("title")
@@ -9711,36 +9709,44 @@
 	  lep: '',
 	  meet_math: '',
 	  meet_read: '',
+	  hs_name: '',
 	  district: ''
 	};
 
-	Object.keys(filters).forEach(function (filter) {
+	var filterNames = Object.keys(filters),
+	  labels = document.createDocumentFragment();
 
+	filterNames.forEach(function (filter) {
+	  var select = document.createElement('select'),
+	    nofilter = document.createElement('option'),
+	    nofilterText = 'No filter';
+
+	  select.id = filter;
+	  nofilter.appendChild(document.createTextNode(nofilterText));
+	  select.appendChild(nofilter);
+
+	  select.addEventListener('change', function (e) {
+	    var value = e.target.value;
+	    filters[filter] = value === nofilterText ? '' : value;
+	    filters.drawGraph();
+	  });
+
+	  var label = document.createElement('label');
+	  label.appendChild(document.createTextNode(filter));
+	  label.appendChild(select);
+	  labels.appendChild(label);
+	});
+
+	document.getElementById('filters').appendChild(labels);
+
+	Object.keys(filters).map(function (filter) {
 	  d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
-	    var select = document.createElement('select'),
-	      nofilterText = 'No filter';
-
-	    var nofilter = document.createElement('option');
-	    nofilter.appendChild(document.createTextNode(nofilterText));
-	    select.appendChild(nofilter);
-
 	    for (var key in filterOptions) {
 	      var option = document.createElement('option');
 	      option.appendChild(document.createTextNode(filterOptions[key]));
-	      select.appendChild(option);
+	      document.getElementById(filter).appendChild(option);
 	      option.value = key;
 	    }
-
-	    select.addEventListener('change', function (e) {
-	      var value = e.target.value;
-	      filters[filter] = value === nofilterText ? '' : value;
-	      filters.drawGraph();
-	    });
-
-	    var label = document.createElement('label');
-	    label.appendChild(document.createTextNode(filter));
-	    label.appendChild(select);
-	    document.getElementById('filters').appendChild(label);
 	  });
 	});
 
@@ -9774,18 +9780,18 @@
 	'use strict';
 
 	var codes = {
-	  H: "Highschool",
-	  G: "Graduated",
-	  X: "Dropped out",
-	  Z: "No achievements",
-	  2: "1st 2 Year",
-	  T: "2nd 2 Year",
-	  4: "1st 4 Year",
-	  F: "2nd 4 Year",
-	  C: "Certificate",
 	  B: "Bachelor+",
 	  A: "Associate",
-	  D: "HS Diploma"
+	  C: "Certificate",
+	  F: "2nd 4 Year",
+	  4: "1st 4 Year",
+	  T: "2nd 2 Year",
+	  2: "1st 2 Year",
+	  G: "Graduated",
+	  D: "HS Diploma",
+	  X: "Did not graduate",
+	  Z: "No achievements",
+	  H: "Highschool",
 	};
 
 	function getCode(stage, index) {
@@ -9809,7 +9815,8 @@
 	      .map(function (code) {
 	        return {
 	          code: code,
-	          name: codes[code]
+	          name: codes[code],
+	          priority: Object.keys(codes).indexOf(code)
 	        };
 	      }),
 	    links: []
@@ -9835,9 +9842,6 @@
 	    var value = modifiedData[key];
 
 	    // Zero and -1 don't need processing
-	    if (modifiedData[key] < 1) {
-	      continue;
-	    }
 
 	    var results = key.split('')
 	      .reduce(function (path, stage, index) {
@@ -10040,21 +10044,20 @@
 	      .key(function (d) {
 	        return d.x;
 	      })
-	      .sortKeys(d3.ascending)
+	      .sortKeys(d3.descending)
 	      .entries(nodes)
 	      .map(function (d) {
 	        return d.values;
 	      });
 
-	    //
 	    initializeNodeDepth();
 	    resolveCollisions();
-	    for (var alpha = 1; iterations > 0; --iterations) {
-	      relaxRightToLeft(alpha *= 0.99);
-	      resolveCollisions();
-	      relaxLeftToRight(alpha);
-	      resolveCollisions();
-	    }
+	    // for (var alpha = 1; iterations > 0; --iterations) {
+	    //   relaxRightToLeft(alpha *= 0.99);
+	    //   resolveCollisions();
+	    //   relaxLeftToRight(alpha);
+	    //   resolveCollisions();
+	    // }
 
 	    function initializeNodeDepth() {
 	      var ky = d3.min(nodesByBreadth, function (nodes) {
@@ -10111,6 +10114,8 @@
 	          n = nodes.length,
 	          i;
 
+	        console.log(nodes);
+
 	        // Push any overlapping nodes down.
 	        nodes.sort(ascendingDepth);
 	        for (i = 0; i < n; ++i) {
@@ -10137,6 +10142,9 @@
 	    }
 
 	    function ascendingDepth(a, b) {
+	      if (a.priority && b.priority) {
+	        return a.priority === b.priority ? 0 : a.priority > b.priority ? 1 : -1;
+	      }
 	      return a.y - b.y;
 	    }
 	  }

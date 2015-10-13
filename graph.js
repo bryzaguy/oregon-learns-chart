@@ -18,7 +18,7 @@ var margin = {
 
 var formatNumber = d3.format(",.0f"),
   format = function (d) {
-    return formatNumber(d) + " TWh";
+    return formatNumber(d) + " students";
   },
   color = d3.scale.category20();
 
@@ -51,8 +51,6 @@ function drawGraph() {
 
     var graph = apiToGraph(data);
     
-    console.log(graph);
-
     if (!graph.links.length) {
       var text = document.createElement('h1');
       text.innerText = 'Not Enough Data';
@@ -74,7 +72,7 @@ function drawGraph() {
         return Math.max(1, d.dy);
       })
       .sort(function (a, b) {
-        return b.dy - a.dy;
+        return a.dy - b.dy;
       });
 
     link.append("title")
