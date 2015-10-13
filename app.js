@@ -9785,19 +9785,20 @@
 	'use strict';
 
 	var codes = {
-	  B: "Bachelor+",
-	  A: "Associate",
-	  C: "Certificate",
-	  F: "2nd 4 Year",
-	  4: "1st 4 Year",
-	  T: "2nd 2 Year",
-	  2: "1st 2 Year",
-	  G: "Graduated",
-	  D: "HS Diploma",
-	  X: "Did not graduate",
-	  Z: "No achievements",
-	  H: "Highschool",
-	};
+	    B: "Bachelor+",
+	    A: "Associate",
+	    C: "Certificate",
+	    F: "2nd 4 Year",
+	    4: "1st 4 Year",
+	    T: "2nd 2 Year",
+	    2: "1st 2 Year",
+	    G: "Graduated",
+	    D: "HS Diploma",
+	    X: "Did not graduate",
+	    Z: "No achievements",
+	    H: "Highschool",
+	  },
+	  priority = ['B', 'A', 'C', 'F', '4', 'T', '2', 'G', 'D', 'X', 'Z', 'H'];
 
 	function getCode(stage, index) {
 	  switch (stage + index) {
@@ -9821,14 +9822,14 @@
 	        return {
 	          code: code,
 	          name: codes[code],
-	          priority: Object.keys(codes).indexOf(code)
+	          priority: priority.indexOf(code)
 	        };
 	      }),
 	    links: []
 	  };
 
 	  var modifiedData = Object.keys(data)
-	      .reduce(function(r, n) {
+	    .reduce(function (r, n) {
 
 	      var key = n.replace('S', '');
 	      if (key.indexOf('2') === 1) {
@@ -9888,7 +9889,6 @@
 
 	  return graph;
 	}
-
 
 
 /***/ },
