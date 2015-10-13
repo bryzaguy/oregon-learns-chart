@@ -222,8 +222,6 @@ module.exports = function () {
           n = nodes.length,
           i;
 
-        console.log(nodes);
-
         // Push any overlapping nodes down.
         nodes.sort(ascendingDepth);
         for (i = 0; i < n; ++i) {
