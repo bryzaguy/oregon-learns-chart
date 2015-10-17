@@ -1,6 +1,7 @@
 'use strict';
 
-var config = require('./config');
+var config = require('./config'),
+  educationNodes = require('./educationNodes').codes;
 
 var filters = {},
   filterLabels = {
@@ -11,13 +12,39 @@ var filters = {},
     meet_math: 'Meets Math Requirements',
     meet_read: 'Meets Reading Requirements',
     hs_name: 'High School',
-    district: 'School District'
+    district: 'School District',
+    education_stage: 'Education Stage'
   };
 
 var filterNames = Object.keys(filterLabels),
   labels = document.createDocumentFragment();
 
-filterNames.forEach(function (filter) {
+// add econw selects
+filterNames.forEach(addFilter);
+
+// add education nodes select
+document.getElementById('filters').appendChild(labels);
+
+
+// add econw filter api meta values
+Object.keys(filterLabels).map(function (filter) {
+  if (filter === 'education_stage') {
+    return;
+  }
+
+  d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
+    for (var key in filterOptions) {
+      addOption(filter, key, filterOptions[key]);
+    }
+  });
+});
+
+// add education node filter values
+for (var nodeKey in educationNodes) {
+  addOption('education_stage', nodeKey, educationNodes[nodeKey]);
+}
+
+function addFilter(filter) {
   var select = document.createElement('select'),
     nofilter = document.createElement('option'),
     nofilterText = 'No filter';
@@ -28,7 +55,7 @@ filterNames.forEach(function (filter) {
 
   select.addEventListener('change', function (e) {
     var value = e.target.value;
-    filters[filter] = value === nofilterText ? '' : value;
+    filters[filter] = nofilterText ? '' : value;
     filters.drawGraph();
   });
 
@@ -40,29 +67,29 @@ filterNames.forEach(function (filter) {
   div.appendChild(label);
   div.appendChild(select);
   labels.appendChild(div);
-});
+}
 
-document.getElementById('filters').appendChild(labels);
+function addOption(filter, key, value){
+  var option = document.createElement('option');
+  option.appendChild(document.createTextNode(value));
+  document.getElementById(filter).appendChild(option);
+  option.value = key;
+}
 
-Object.keys(filterLabels).map(function (filter) {
-  d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
-    for (var key in filterOptions) {
-      var option = document.createElement('option');
-      option.appendChild(document.createTextNode(filterOptions[key]));
-      document.getElementById(filter).appendChild(option);
-      option.value = key;
-    }
-  });
-});
-
-filters.query = function () {
+var query = function () {
   var params = [];
-  for (var key in this) {
-    if (typeof this[key] !== 'function' && this[key]) {
-      params.push('&' + key + '=' + this[key]);
+  for (var key in filters) {
+    if (filters[key] && key !== 'education_stage') {
+      params.push('&' + key + '=' + filters[key]);
     }
   }
   return params.join('');
 }
 
-module.exports = filters;
+module.exports = {
+  query: query,
+  filters: filters,
+  drawGraph: function () {
+    // To be replaced in graph.js
+  }
+};
