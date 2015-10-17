@@ -1,7 +1,7 @@
 'use strict';
 
 var d3 = require('d3'),
-  filters = require('./filters'),
+  filters = require('./filters')(drawGraph),
   config = require('./config'),
   apiToGraph = require('./apiToGraph');
 
@@ -24,10 +24,10 @@ var formatNumber = d3.format(",.0f"),
 
 drawGraph();
 
-filters.drawGraph = drawGraph;
-
 function drawGraph() {
   var chart = d3.select("#chart");
+
+  console.log(filters.query(), filters.values);
 
   d3.json(config.url + '?format=json' + filters.query(), function (data) {
     var node = document.getElementById('chart');
@@ -49,7 +49,7 @@ function drawGraph() {
 
     var path = sankey.link();
 
-    var graph = apiToGraph(data);
+    var graph = apiToGraph(data, filters.values.education_event);
     
     if (!graph.links.length) {
       var text = document.createElement('h1');
