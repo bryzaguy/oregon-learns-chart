@@ -2,21 +2,14 @@
 
 var educationNodes = require('./educationNodes'),
   transformData = require('./transformData'),
-  codes = educationNodes.codes,
-  priority = educationNodes.priority;
+  extractNodes = require('./extractNodes');
 
 module.exports = function (data) {
   var graph = {
-    nodes: [],
+    nodes: extractNodes(data),
     links: []
-  }, graphNodes = Object.keys(codes)
-    .map(function (code) {
-      return {
-        code: code,
-        name: codes[code],
-        priority: priority.indexOf(code)
-      };
-    });
+  },
+  nodes = graph.nodes;
 
   var result = {};
   for (var point in data) {
@@ -34,28 +27,7 @@ module.exports = function (data) {
       }, result);
   }
 
-  graph.nodes = graphNodes.filter(function(_, i) {
-    return graph.links.some(function (l) {
-      return l.target === i || l.source === i;
-    });
-  });
-
-  var includedPaths = Object.keys(
-      Object.keys(result)
-        .reduce(function(r, n) {
-          var p = n.split('');
-          r[p[0]] = true;
-          r[p[1]] = true;
-          return r;
-        }, {})
-    );
-
-  graph.nodes = graphNodes.filter(function (n) {
-    return includedPaths.indexOf(n.code) > -1;
-  });
-
-  var codeIndeces = graph.nodes
-    .reduce(function (r, n, i) {
+  var codeIndeces = nodes.reduce(function (r, n, i) {
       r[n.code] = i;
       return r;
     }, {});

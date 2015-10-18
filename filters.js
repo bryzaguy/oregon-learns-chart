@@ -60,6 +60,7 @@ module.exports = function (drawGraph) {
     input.type = 'checkbox';
     input.className = 'path-filter';
     input.value = value;
+    input.id = value;
 
     input.addEventListener('change', function () {
       var f = document.getElementsByClassName('path-filter'),
@@ -75,11 +76,17 @@ module.exports = function (drawGraph) {
       filtersModule.pathFilters = pathFilters;
       drawGraph();
     });
-   
+
+    var div = document.createElement('div');
+    div.className = 'tab';
+
     var label = document.createElement('label');
     label.appendChild(document.createTextNode(text));
-    label.appendChild(input);
-    paths.appendChild(label);
+    div.appendChild(input);
+    label.htmlFor = value;
+    div.appendChild(label);
+
+    paths.appendChild(div);
   }
 
   function addFilter(filter) {

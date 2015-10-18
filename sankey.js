@@ -248,7 +248,7 @@ module.exports = function () {
     }
 
     function ascendingDepth(a, b) {
-      if (a.priority && b.priority) {
+      if (typeof a.priority === "number" && typeof b.priority === "number") {
         return a.priority === b.priority ? 0 : a.priority > b.priority ? 1 : -1;
       }
       return a.y - b.y;

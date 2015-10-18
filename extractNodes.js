@@ -13,12 +13,14 @@ function uniqueValues(data) {
   return Object.keys(o);
 }
 
-module.exports = function (paths) {
-  var nodes = paths.reduce(function (r, path) {
-      return r.concat(path)
+module.exports = function (groups) {
+  var nodes = groups.reduce(function (r, group) {
+      return r.concat(group.path);
     }, []);
 
-  return uniqueValues(nodes).map(function (code) {
+  var unique = uniqueValues(nodes);
+
+  return unique.map(function (code) {
       return {
         code: code,
         name: codes[code],

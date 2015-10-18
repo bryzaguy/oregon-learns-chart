@@ -14,10 +14,8 @@ var margin = {
     right: 1,
     bottom: 6,
     left: 1
-  },
-  width = 960 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
-
+  };
+  
 var formatNumber = d3.format(",.0f"),
   format = function (d) {
     return formatNumber(d) + " students";
@@ -30,7 +28,9 @@ function drawGraph() {
   var chart = d3.select("#chart");
 
   d3.json(config.url + '?format=json' + filters.query(), function (data) {
-    var node = document.getElementById('chart');
+    var node = document.getElementById('chart'),
+    width = node.offsetWidth - margin.left - margin.right,
+    height = node.offsetHeight - margin.top - margin.bottom;
 
     while (node.firstChild) { 
       node.removeChild(node.firstChild); 
