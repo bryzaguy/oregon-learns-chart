@@ -27,8 +27,6 @@ drawGraph();
 function drawGraph() {
   var chart = d3.select("#chart");
 
-  console.log(filters.query(), filters.values);
-
   d3.json(config.url + '?format=json' + filters.query(), function (data) {
     var node = document.getElementById('chart');
 

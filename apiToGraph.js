@@ -19,18 +19,18 @@ function getCode(stage, index) {
   }
 }
 
-module.exports = function (data) {
+module.exports = function (data, stageFilter) {
   var graph = {
-    nodes: Object.keys(codes)
-      .map(function (code) {
-        return {
-          code: code,
-          name: codes[code],
-          priority: priority.indexOf(code)
-        };
-      }),
+    nodes: [],
     links: []
-  };
+  }, graphNodes = Object.keys(codes)
+    .map(function (code) {
+      return {
+        code: code,
+        name: codes[code],
+        priority: priority.indexOf(code)
+      };
+    });
 
   var modifiedData = Object.keys(data)
     .reduce(function (r, n) {
@@ -64,7 +64,7 @@ module.exports = function (data) {
         return path;
       }, [])
       .reduce(function (edges, stage, index, path) {
-        if (index) {
+        if (index && (!stageFilter || path.indexOf(stageFilter) > -1)) {
           var lastStage = path[index - 1];
           var edgeKey = lastStage + stage;
           edges[edgeKey] = (edges[edgeKey] || 0) + value;
@@ -73,6 +73,26 @@ module.exports = function (data) {
         return edges;
       }, result);
   }
+
+  graph.nodes = graphNodes.filter(function(_, i) {
+    return graph.links.some(function (l) {
+      return l.target === i || l.source === i;
+    });
+  });
+
+  var includedPaths = Object.keys(
+      Object.keys(result)
+        .reduce(function(r, n) {
+          var p = n.split('');
+          r[p[0]] = true;
+          r[p[1]] = true;
+          return r;
+        }, {})
+    );
+
+  graph.nodes = graphNodes.filter(function (n) {
+    return includedPaths.indexOf(n.code) > -1;
+  });
 
   var codeIndeces = graph.nodes
     .reduce(function (r, n, i) {

@@ -9,7 +9,7 @@ module.exports = {
     4: "1st 4 Year",
     T: "2nd 2 Year",
     2: "1st 2 Year",
-    G: "Graduated",
+    G: "HS Graduate",
     D: "HS Diploma",
     X: "Did not graduate",
     Z: "No achievements",
