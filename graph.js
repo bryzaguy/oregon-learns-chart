@@ -50,9 +50,7 @@ function drawGraph() {
     var path = sankey.link();
 
     var transformed = transformData(data);
-
     var filtered = filterData(transformed, filters.pathFilters);
-
     var sum = filtered.reduce(function (r, n) {
         return r + n.value;
       }, 0);
