@@ -3,7 +3,9 @@
 var d3 = require('d3'),
   filters = require('./filters')(drawGraph),
   config = require('./config'),
-  apiToGraph = require('./apiToGraph');
+  transformData = require('./transformData'),
+  apiToGraph = require('./apiToGraph'),
+  filterData = require('./filterData');
 
 d3.sankey = require('./sankey');
 
@@ -47,7 +49,17 @@ function drawGraph() {
 
     var path = sankey.link();
 
-    var graph = apiToGraph(data, filters.values.education_event);
+    var transformed = transformData(data);
+
+    var filtered = filterData(transformed, filters.pathFilters);
+
+    var sum = filtered.reduce(function (r, n) {
+        return r + n.value;
+      }, 0);
+
+    document.getElementById('scale').innerText = sum;
+
+    var graph = apiToGraph(filtered);
     
     if (!graph.links.length) {
       var text = document.createElement('h1');

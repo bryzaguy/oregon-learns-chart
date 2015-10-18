@@ -2,9 +2,10 @@
 
 module.exports = function (drawGraph) {
   var config = require('./config'),
-    educationNodes = require('./educationNodes').codes;
+  educationNodes = require('./educationNodes');
 
   var filters = {},
+    nodeFilters = [],
     filterLabels = {
       gender: 'Gender',
       ethnicity: 'Ethnicity',
@@ -13,43 +14,31 @@ module.exports = function (drawGraph) {
       meet_math: 'Meets Math Requirements',
       meet_read: 'Meets Reading Requirements',
       hs_name: 'High School',
-      district: 'School District',
-      education_event: 'Education Event'
+      district: 'School District'
     };
 
   var query = function () {
     var params = [];
       for (var key in filters) {
-        if (filters[key] && key !== 'education_event') {
+        if (filters[key]) {
           params.push('&' + key + '=' + filters[key]);
         }
       }
       return params.join('');
     },
     filtersModule = {
-      query: query,
-      values: filters,
-      drawGraph: function () {
-        // To be replaced in graph.js
-      }
+      query: query
     };
 
   var filterNames = Object.keys(filterLabels),
-    labels = document.createDocumentFragment();
+    labels = document.createDocumentFragment(),
+    paths = document.createDocumentFragment();
 
-  // add econw selects
   filterNames.forEach(addFilter);
 
-  // add education nodes select
   document.getElementById('filters').appendChild(labels);
 
-
-  // add econw filter api meta values
   Object.keys(filterLabels).map(function (filter) {
-    if (filter === 'education_event') {
-      return;
-    }
-
     d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
       for (var key in filterOptions) {
         addOption(filter, key, filterOptions[key]);
@@ -57,9 +46,40 @@ module.exports = function (drawGraph) {
     });
   });
 
-  // add education node filter values
-  for (var nodeKey in educationNodes) {
-    addOption('education_event', nodeKey, educationNodes[nodeKey]);
+  var priority = educationNodes.priority.concat([]);
+  priority.reverse();
+  for (var index in priority) {
+    var code = priority[index];
+    addCheckbox(educationNodes.codes[code], code);
+  }
+
+  document.getElementById('pathfilters').appendChild(paths);
+
+  function addCheckbox(text, value) {
+    var input = document.createElement('input');
+    input.type = 'checkbox';
+    input.className = 'path-filter';
+    input.value = value;
+
+    input.addEventListener('change', function () {
+      var f = document.getElementsByClassName('path-filter'),
+        inputs = Array.prototype.slice.call(f),
+        pathFilters = [];
+
+      for (var i in inputs) {
+        if (inputs[i].checked) {
+          pathFilters.push(inputs[i].value);
+        }
+      }
+
+      filtersModule.pathFilters = pathFilters;
+      drawGraph();
+    });
+   
+    var label = document.createElement('label');
+    label.appendChild(document.createTextNode(text));
+    label.appendChild(input);
+    paths.appendChild(label);
   }
 
   function addFilter(filter) {
@@ -77,13 +97,14 @@ module.exports = function (drawGraph) {
       drawGraph();
     });
 
-    var label = document.createElement('label');
-    label.appendChild(document.createTextNode(filterLabels[filter]));
     var div = document.createElement('div');
     div.className = 'filter-container';
 
+    var label = document.createElement('label');
+    label.appendChild(document.createTextNode(filterLabels[filter]));
     div.appendChild(label);
     div.appendChild(select);
+
     labels.appendChild(div);
   }
 

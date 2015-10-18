@@ -1,25 +1,11 @@
 'use strict';
 
 var educationNodes = require('./educationNodes'),
+  transformData = require('./transformData'),
   codes = educationNodes.codes,
   priority = educationNodes.priority;
 
-function getCode(stage, index) {
-  switch (stage + index) {
-    case 'X2':
-    case 'X3':
-    case 'X4':
-      return 'Z';
-    case '43':
-      return 'F';
-    case '23':
-      return 'T';
-    default:
-      return stage;
-  }
-}
-
-module.exports = function (data, stageFilter) {
+module.exports = function (data) {
   var graph = {
     nodes: [],
     links: []
@@ -32,39 +18,13 @@ module.exports = function (data, stageFilter) {
       };
     });
 
-  var modifiedData = Object.keys(data)
-    .reduce(function (r, n) {
-
-      var key = n.replace('S', '');
-      if (key.indexOf('2') === 1) {
-        key = key.split('')[0] + key.substring(2);
-      }
-
-      if (data[n] > 0) {
-        r[key] = (r[key] || 0) + data[n];
-      }
-
-      return r;
-    }, {});
-
   var result = {};
-  for (var key in modifiedData) {
-    var value = modifiedData[key];
+  for (var point in data) {
+    var value = data[point].value;
 
-    // Zero and -1 don't need processing
-
-    var results = key.split('')
-      .reduce(function (path, stage, index) {
-        path.push(getCode(stage, index));
-
-        if (index === 2 && key.length === 4) {
-          path.push(getCode(stage, 3));
-        }
-
-        return path;
-      }, [])
-      .reduce(function (edges, stage, index, path) {
-        if (index && (!stageFilter || path.indexOf(stageFilter) > -1)) {
+    data[point].path.reduce(
+      function (edges, stage, index, path) {
+        if (index) {
           var lastStage = path[index - 1];
           var edgeKey = lastStage + stage;
           edges[edgeKey] = (edges[edgeKey] || 0) + value;
