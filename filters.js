@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (drawGraph) {
+module.exports = function (loadGraph, refreshGraph) {
   var config = require('./config'),
   educationNodes = require('./educationNodes');
 
@@ -74,7 +74,7 @@ module.exports = function (drawGraph) {
       }
 
       filtersModule.pathFilters = pathFilters;
-      drawGraph();
+      refreshGraph();
     });
 
     var div = document.createElement('div');
@@ -101,7 +101,7 @@ module.exports = function (drawGraph) {
     select.addEventListener('change', function (e) {
       var value = e.target.value;
       filters[filter] = nofilterText == value ? '' : value;
-      drawGraph();
+      loadGraph();
     });
 
     var div = document.createElement('div');
