@@ -242,7 +242,7 @@ function drawGraph() {
     }, 0);
 
   document.getElementById('scale').innerText = sum;
-
+  
   var graph = apiToGraph(filtered);
   
   if (!graph.links.length) {
@@ -259,7 +259,6 @@ function drawGraph() {
     }];
   }
 
-  console.log(graph);
 
   sankey
     .nodes(graph.nodes)

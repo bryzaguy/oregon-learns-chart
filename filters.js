@@ -10,9 +10,9 @@ module.exports = function (loadGraph, refreshGraph) {
       gender: 'Gender',
       ethnicity: 'Ethnicity',
       poverty: 'Poverty',
-      lep: 'Limited English Proficiency',
-      meet_math: 'Meets Math Requirements',
-      meet_read: 'Meets Reading Requirements',
+      lep: 'English Proficiency',
+      meet_math: 'Math',
+      meet_read: 'Reading',
       hs_name: 'High School',
       district: 'School District'
     };
