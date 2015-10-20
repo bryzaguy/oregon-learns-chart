@@ -58,7 +58,7 @@ function refreshGraph() {
   var path = sankey.link();
 
   var transformed = transformData(data);
-  var filtered = filterData(transformed, filters.pathFilters);
+  var filtered = filterData(transformed, filters.nodeFilters);
   var sum = filtered.reduce(function (r, n) {
       return r + n.value;
     }, 0);
@@ -236,7 +236,7 @@ function drawGraph() {
   var path = sankey.link();
 
   var transformed = transformData(data);
-  var filtered = filterData(transformed, filters.pathFilters);
+  var filtered = filterData(transformed, filters.nodeFilters);
   var sum = filtered.reduce(function (r, n) {
       return r + n.value;
     }, 0);
@@ -245,21 +245,6 @@ function drawGraph() {
   
   var graph = apiToGraph(filtered);
   
-  if (!graph.links.length) {
-    graph.nodes = [{
-      name: '',
-      priority: 0
-    }, {
-      name: '',
-      priority: 1
-    }]
-    graph.links = [{
-      source: 0,
-      target: 1
-    }];
-  }
-
-
   sankey
     .nodes(graph.nodes)
     .links(graph.links)

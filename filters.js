@@ -5,14 +5,16 @@ module.exports = function (loadGraph, refreshGraph) {
   educationNodes = require('./educationNodes');
 
   var filters = {},
-    nodeFilters = [],
-    filterLabels = {
+    nodeFilters = {},
+    radioFilters = {
       gender: 'Gender',
       ethnicity: 'Ethnicity',
       poverty: 'Poverty',
       lep: 'English Proficiency',
       meet_math: 'Math',
-      meet_read: 'Reading',
+      meet_read: 'Reading'
+    }, 
+    selectFilters = {
       hs_name: 'High School',
       district: 'School District'
     };
@@ -30,69 +32,123 @@ module.exports = function (loadGraph, refreshGraph) {
       query: query
     };
 
-  var filterNames = Object.keys(filterLabels),
-    labels = document.createDocumentFragment(),
-    paths = document.createDocumentFragment();
+  var filterFragment = document.createDocumentFragment(),
+    radios = Object.keys(radioFilters),
+    selects = Object.keys(selectFilters);
 
-  filterNames.forEach(addFilter);
+  radios.forEach(addApiRadio);
+  selects.forEach(addSelectFilter);
 
-  document.getElementById('filters').appendChild(labels);
+  educationNodes.filterGroups.forEach(addRadio.bind(null, refreshCb));
 
-  Object.keys(filterLabels).map(function (filter) {
-    d3.json(config.url + '/meta/' + filter + '/?format=json', function (filterOptions) {
+  document.getElementById('filters').appendChild(filterFragment);
+
+  radios.map(function (filter) {
+    callApi(filter, function (filterOptions) {
       for (var key in filterOptions) {
-        addOption(filter, key, filterOptions[key]);
+        addRadioOption(filter, filterOptions[key], key, apiCb(filter));
       }
     });
   });
 
-  var priority = educationNodes.priority.concat([]);
-  priority.reverse();
-  for (var index in priority) {
-    var code = priority[index];
-    addCheckbox(educationNodes.codes[code], code);
+  selects.map(function (filter) {
+    callApi(filter, function (filterOptions) {
+      for (var key in filterOptions) {
+        addOption(filter, filterOptions[key], key);
+      }
+    });
+  });
+
+  educationNodes.filterGroups.forEach(function(group) {
+    group.codes.map(function (key) {
+      addRadioOption(group.id, educationNodes.codes[key], key, refreshCb());
+    });
+  });
+
+  function callApi(filter, cb) {
+    var url = config.url + '/meta/' + filter + '/?format=json';
+    d3.json(url, function (filterOptions) {
+      cb(filterOptions);
+    });
   }
 
-  document.getElementById('pathfilters').appendChild(paths);
+  function refreshCb() {
+    return function(e) {
+      var value = e.target.value;
+      nodeFilters[e.target.name] = value === 'all' ? '' : value;
+      filtersModule.nodeFilters = Object.keys(nodeFilters)
+        .map(function (i) { 
+          return nodeFilters[i]; 
+        })
+        .filter(function (v) {
+          return v !== '';
+        });
 
-  function addCheckbox(text, value) {
-    var input = document.createElement('input');
-    input.type = 'checkbox';
-    input.className = 'path-filter';
-    input.value = value;
-    input.id = value;
-
-    input.addEventListener('change', function () {
-      var f = document.getElementsByClassName('path-filter'),
-        inputs = Array.prototype.slice.call(f),
-        pathFilters = [];
-
-      for (var i in inputs) {
-        if (inputs[i].checked) {
-          pathFilters.push(inputs[i].value);
-        }
-      }
-
-      filtersModule.pathFilters = pathFilters;
       refreshGraph();
-    });
+    };
+  }
 
+  function apiCb(filter) {
+    return function(e) {
+      var value = e.target.value;
+      filters[e.target.name] = value === 'all' ? '' : value;
+      loadGraph();
+    };
+  }
+
+  function addApiRadio(filter) {
+    addRadio(apiCb, {
+      id: filter,
+      name: radioFilters[filter]
+    });
+  }
+
+  function addRadio(cb, radio) {
+    var div = document.createElement('div');
+    div.id = radio.id;
+    div.className = 'tabs';
+
+    var input = addRadioOption(radio.id, 'All', 'all', cb(radio.id), div);
+    input.checked = true;
+
+    var container = document.createElement('div');
+    container.className = 'filter-container';
+    var label = document.createElement('label');
+    label.appendChild(document.createTextNode(radio.name));
+    container.appendChild(label);
+    container.appendChild(div);
+
+    filterFragment.appendChild(container);
+  }
+
+  function addRadioOption(filter, text, value, cb, parent) {
+    if (!parent) parent = document.getElementById(filter);
+    var input = document.createElement('input');
+    input.type = 'radio';
+    input.name = filter;
+    input.value = value;
+    input.id = filter + '-' + value;
+
+    input.addEventListener('change', cb);
+    
     var div = document.createElement('div');
     div.className = 'tab';
 
     var label = document.createElement('label');
     label.appendChild(document.createTextNode(text));
     div.appendChild(input);
-    label.htmlFor = value;
+    label.htmlFor = filter + '-' + value;
     div.appendChild(label);
 
-    paths.appendChild(div);
+    parent.appendChild(div);
+
+    return input;
   }
 
-  function addFilter(filter) {
+  function addSelectFilter(filter) {
     var select = document.createElement('select'),
       nofilter = document.createElement('option'),
-      nofilterText = 'No filter';
+      nofilterText = 'All';
 
     select.id = filter;
     nofilter.appendChild(document.createTextNode(nofilterText));
@@ -108,18 +164,18 @@ module.exports = function (loadGraph, refreshGraph) {
     div.className = 'filter-container';
 
     var label = document.createElement('label');
-    label.appendChild(document.createTextNode(filterLabels[filter]));
+    label.appendChild(document.createTextNode(selectFilters[filter]));
     div.appendChild(label);
     div.appendChild(select);
 
-    labels.appendChild(div);
+    filterFragment.appendChild(div);
   }
 
-  function addOption(filter, key, value){
+  function addOption(filter, text, value){
     var option = document.createElement('option');
-    option.appendChild(document.createTextNode(value));
+    option.appendChild(document.createTextNode(text));
     document.getElementById(filter).appendChild(option);
-    option.value = key;
+    option.value = value;
   }
 
   return filtersModule;

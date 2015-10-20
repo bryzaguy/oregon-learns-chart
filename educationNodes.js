@@ -15,18 +15,22 @@ module.exports = {
     X: "Did not graduate",
     H: "Highschool",
   },
-  priority: ['B', 'A', 'C', 'Z', 'F', '4', 'T', '2', 'G', 'D', 'X', 'H'],
+  priority: ['B', 'A', 'C', 'D', 'Z', 'F', '4', 'T', '2', 'G', 'X', 'H'],
   filterGroups: [{
     name: 'Achievements',
+    id: 'achievements-filters',
     codes: ['B', 'A', 'C', 'D', 'Z']
   }, {
     name: 'First Enrollment',
-    codes: ['2', '4']
+    id: 'first-enrollment-filters',
+    codes: ['4', '2']
   }, {
     name: 'Second Enrollment',
-    codes: ['T', 'F']
+    id: 'second-enrollment-filters',
+    codes: ['F', 'T']
   }, {
     name: 'Highschool Graduate',
-    codes: ['H', 'X']
+    id: 'hs-graduate-filters',
+    codes: ['G', 'X']
   }]
 };
