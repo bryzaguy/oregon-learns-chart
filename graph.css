@@ -2,10 +2,11 @@
   font-family: sans-serif;
 }
 
-label {
+.filter-container label {
   display: inline-block;
   padding: 5px;
   font-size: 12px;
+  max-width: initial;
 }
 
 svg {
@@ -42,6 +43,7 @@ svg {
   float: left;
   display: inline-block;
   padding: 3px 10px;
+  height: 79px;
 }
 
 #filters {
@@ -84,6 +86,7 @@ h2 {
   user-select: none;  
   cursor: pointer;
   padding: 7px;
+  font-weight: 300;
   border: 1px solid #ccc;
   margin-left: -1px;
   position: relative;
