@@ -7,6 +7,8 @@ var d3 = require('d3'),
   apiToGraph = require('./apiToGraph'),
   filterData = require('./filterData');
 
+require('style!css!./graph.css');
+
 d3.sankey = require('./sankey');
 
 var margin = {
