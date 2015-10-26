@@ -15,7 +15,7 @@ svg {
 
 #chart {
   height: 400px;
-  width: 900px;
+  max-width: 900px;
 }
 
 .node rect {

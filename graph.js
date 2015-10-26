@@ -27,6 +27,8 @@ var formatNumber = d3.format(",.0f"),
 
 loadGraph(drawGraph);
 
+window.onresize = refreshGraph;
+
 function loadGraph(cb) {
   d3.json(config.url + '?format=json' + filters.query(), function(response) {
     data = response;

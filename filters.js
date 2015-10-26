@@ -6,18 +6,16 @@ module.exports = function (loadGraph, refreshGraph) {
 
   var filters = {},
     nodeFilters = {},
-    radioFilters = {
+    selectFilters = {
       gender: 'Gender',
       ethnicity: 'Ethnicity',
       poverty: 'Poverty',
       lep: 'English Proficiency',
       meet_math: 'Math',
-      meet_read: 'Reading'
-    }, 
-    selectFilters = {
+      meet_read: 'Reading',
       hs_name: 'High School',
       district: 'School District'
-    };
+    }, radioFilters = {};
 
   var query = function () {
     var params = [];
