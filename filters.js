@@ -35,7 +35,7 @@ module.exports = function (loadGraph, refreshGraph) {
     selects = Object.keys(selectFilters);
 
   // radios.forEach(addApiRadio);
-  
+
   selects.forEach(function(s) {
     addSelectFilter(apiCb, s, selectFilters[s]);
   });
@@ -154,6 +154,7 @@ module.exports = function (loadGraph, refreshGraph) {
       nofilterText = 'All';
 
     select.id = filter;
+    select.name = filter;
     nofilter.appendChild(document.createTextNode(nofilterText));
     select.appendChild(nofilter);
 
