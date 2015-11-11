@@ -62,6 +62,7 @@ function refreshGraph() {
   var path = sankey.link();
 
   var transformed = transformData(data);
+  console.log(filters.nodeFilters);
   var filtered = filterData(transformed, filters.nodeFilters);
   var sum = filtered.reduce(function (r, n) {
       return r + n.value;

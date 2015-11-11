@@ -78,7 +78,7 @@ module.exports = function (loadGraph, refreshGraph) {
   function refreshCb() {
     return function(e) {
       var value = e.target.value;
-      nodeFilters[e.target.name] = value === 'all' ? '' : value;
+      nodeFilters[e.target.name] = value.toLowerCase() === 'all' ? '' : value;
       filtersModule.nodeFilters = Object.keys(nodeFilters)
         .map(function (i) { 
           return nodeFilters[i]; 
