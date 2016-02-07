@@ -45,6 +45,9 @@ module.exports = function (loadGraph, refreshGraph) {
   });
 
   document.getElementById('filters').appendChild(filterFragment);
+  var clearBoth = document.createElement('div');
+  clearBoth.style.clear = 'both';
+  document.getElementById('filters').appendChild(clearBoth);
 
   // radios.map(function (filter) {
   //   callApi(filter, function (filterOptions) {
